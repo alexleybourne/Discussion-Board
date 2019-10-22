@@ -62,3 +62,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "materialize-sass", "~> 1.0"
+
+gem "figaro", "~> 1.1"
