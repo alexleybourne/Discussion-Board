@@ -1,5 +1,6 @@
 class DisscussionsController < ApplicationController
-  before_action :set_disscussion, only: [:show, :edit, :update, :destroy]
+  skip_before_action :authenticate_user!, only: [:index, :show]
+  before_action :set_owned_disscussion, only: [:edit, :update, :destroy]
 
   # GET /disscussions
   # GET /disscussions.json
@@ -10,6 +11,7 @@ class DisscussionsController < ApplicationController
   # GET /disscussions/1
   # GET /disscussions/1.json
   def show
+    @disscussion = Disscussion.find(params[:id])
   end
 
   # GET /disscussions/new
@@ -24,7 +26,7 @@ class DisscussionsController < ApplicationController
   # POST /disscussions
   # POST /disscussions.json
   def create
-    @disscussion = Disscussion.new(disscussion_params)
+    @disscussion = current_user.disscussions.new(disscussion_params)
 
     respond_to do |format|
       if @disscussion.save
@@ -63,8 +65,13 @@ class DisscussionsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_disscussion
-      @disscussion = Disscussion.find(params[:id])
+    def set_owned_disscussion
+      begin
+        @disscussion = current_user.disscussions.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        flash[:notice ] = "You don't have access to that"
+        redirect_to root_path
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
