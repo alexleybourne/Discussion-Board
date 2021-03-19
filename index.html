@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BG Removal</title>
+        <title>TFJS Bodypix Demo</title>
         <!-- Load TensorFlow.js -->
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
         <!-- Load BodyPix -->
@@ -12,20 +12,35 @@
     </head>
     <body>
 
-        
+        <!-- Random -->
         <!-- https://source.unsplash.com/500x500/?portrait -->
 
-        <img id='image' src='https://avatars.githubusercontent.com/u/54232249?v=4' crossorigin='anonymous' width='500' height='500'/>
-        <canvas id="canvas" width='500' height='500'></canvas>
+        <!-- Musk -->
+        <!-- https://i.ibb.co/BKJ9719/Musk.png -->
+
+        <!-- Me -->
+        <!-- https://avatars.githubusercontent.com/u/54232249?v=4 -->
+
+        <img id='image' src='https://i.ibb.co/BKJ9719/Musk.png' crossorigin='anonymous' width='400' height='400'/>
+        <canvas id="canvas" width='400' height='400'></canvas>
         <a href='https://github.com/tensorflow/tfjs-models/tree/master/body-pix' target='_blank'>Body Pix TFJS Model</a>
     </body>
     <!-- Place your code in the script tag below. You can also use an external .js file -->
     <script>
         async function loadAndPredict() {
 
-            const img = document.getElementById('image');
+            // Shared code
 
+            // Grabbing our image
+            const img = document.getElementById('image');
+            // Grabbing the canvas
+            const canvas = document.getElementById('canvas');
+            // loading the model
             const net = await bodyPix.load();
+            
+
+            // FACE BLUR 
+
             const partSegmentation = await net.segmentMultiPersonParts(img);
 
             const backgroundBlurAmount = 8;
@@ -33,11 +48,63 @@
             const flipHorizontal = false;
             const faceBodyPartIdsToBlur = [0, 1];
 
-            const canvas = document.getElementById('canvas');
-
             bodyPix.blurBodyPart(
                 canvas, img, partSegmentation, faceBodyPartIdsToBlur,
-                backgroundBlurAmount, edgeBlurAmount, flipHorizontal);
+                backgroundBlurAmount, edgeBlurAmount, flipHorizontal
+            );
+
+            // Square Pixel blur TEST
+
+            // console.log('PART Segmentation: ',  partSegmentation);
+            // const coloredPartImage = bodyPix.toColoredPartMask(partSegmentation);
+            // console.log('Colored part image: ', coloredPartImage);
+            // const opacity = 0.7;
+            // const flipHorizontal = false;
+            // const maskBlurAmount = 1;
+            // const pixelCellWidth = 10.0;
+
+            // bodyPix.drawPixelatedMask(
+            //     canvas, img, coloredPartImage, opacity, maskBlurAmount,
+            //     flipHorizontal, pixelCellWidth
+            // );
+
+
+            // BW MASKING
+
+            // const segmentation = await net.segmentPerson(img);
+            // // The mask image is an binary mask image with a 1 where there is a person and
+            // // a 0 where there is not.
+            // const coloredPartImage = bodyPix.toMask(segmentation);
+            // const opacity = 1;
+            // const flipHorizontal = false;
+            // const maskBlurAmount = 1;
+            // // Draw the mask image on top of the original image onto a canvas.
+            // // The colored part image will be drawn semi-transparent, with an opacity of
+            // // 0.7, allowing for the original image to be visible under.
+
+            // console.log('DATA:', canvas, img, coloredPartImage, opacity, maskBlurAmount,
+            //     flipHorizontal)
+
+            // bodyPix.drawMask(
+            //     canvas, img, coloredPartImage, opacity, maskBlurAmount,
+            //     flipHorizontal
+            // );
+
+
+            // Background Blur
+
+            // const segmentation = await net.segmentPerson(img);
+
+            // const backgroundBlurAmount = 3;
+            // const edgeBlurAmount = 3;
+            // const flipHorizontal = false;
+
+            // // Draw the image with the background blurred onto the canvas. The edge between
+            // // the person and blurred background is blurred by 3 pixels.
+            // bodyPix.drawBokehEffect(
+            //     canvas, img, segmentation, backgroundBlurAmount,
+            //     edgeBlurAmount, flipHorizontal
+            // );
         }
         loadAndPredict();
     </script>
