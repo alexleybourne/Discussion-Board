@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BG Removal</title>
-    <!-- Load TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
-    <!-- Load BodyPix -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
-</head>
-<body>
-    <img id='image' src='images/person.jpg' crossorigin='anonymous'/>
-  </body>
-  <!-- Place your code in the script tag below. You can also use an external .js file -->
-  <script>
-    const img = document.getElementById('image');
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BG Removal</title>
+        <!-- Load TensorFlow.js -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
+        <!-- Load BodyPix -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
+    </head>
+    <body>
 
-    async function loadAndPredict() {
-      const net = await bodyPix.load(/** optional arguments, see below **/);
+        
+        <!-- https://source.unsplash.com/500x500/?portrait -->
 
-      /**
-       * One of (see documentation below):
-       *   - net.segmentPerson
-       *   - net.segmentPersonParts
-       *   - net.segmentMultiPerson
-       *   - net.segmentMultiPersonParts
-       * See documentation below for details on each method.
-       */
-      const segmentation = await net.segmentPerson(img);
-      console.log(segmentation);
-    }
-    loadAndPredict();
-  </script>
+        <img id='image' src='https://avatars.githubusercontent.com/u/54232249?v=4' crossorigin='anonymous' width='500' height='500'/>
+        <canvas id="canvas" width='500' height='500'></canvas>
+        <a href='https://github.com/tensorflow/tfjs-models/tree/master/body-pix' target='_blank'>Body Pix TFJS Model</a>
+    </body>
+    <!-- Place your code in the script tag below. You can also use an external .js file -->
+    <script>
+        async function loadAndPredict() {
+
+            const img = document.getElementById('image');
+
+            const net = await bodyPix.load();
+            const partSegmentation = await net.segmentMultiPersonParts(img);
+
+            const backgroundBlurAmount = 8;
+            const edgeBlurAmount = 4;
+            const flipHorizontal = false;
+            const faceBodyPartIdsToBlur = [0, 1];
+
+            const canvas = document.getElementById('canvas');
+
+            bodyPix.blurBodyPart(
+                canvas, img, partSegmentation, faceBodyPartIdsToBlur,
+                backgroundBlurAmount, edgeBlurAmount, flipHorizontal);
+        }
+        loadAndPredict();
+    </script>
 </html>
